@@ -24,6 +24,7 @@ function div() {
 }
 
 $.imgAreaSelect = function (img, options) {
+    // 初始化变量
     var
 
         $img = $(img),
@@ -54,6 +55,7 @@ $.imgAreaSelect = function (img, options) {
 
         startX, startY,
 
+        // 比例尺
         scaleX, scaleY,
 
         resize,
@@ -126,20 +128,26 @@ $.imgAreaSelect = function (img, options) {
     function adjust() {
         if (!imgLoaded || !$img.width())
             return;
-
+        // 图片偏移量（应该是左顶点的坐标）
         imgOfs = { left: round($img.offset().left), top: round($img.offset().top) };
 
+        // 获取图片的宽度和高度
         imgWidth = $img.innerWidth();
         imgHeight = $img.innerHeight();
 
+        // 调整加上border的1/2
+        // innerHeight() - 返回元素的高度（包含 padding）
+        // outerHeight() - 返回元素的宽度（包含 padding 和 border）
         imgOfs.top += ($img.outerHeight() - imgHeight) >> 1;
         imgOfs.left += ($img.outerWidth() - imgWidth) >> 1;
 
+        // 设置options参数，minWidth，minHeight，maxWidth，maxHeight
         minWidth = round(options.minWidth / scaleX) || 0;
         minHeight = round(options.minHeight / scaleY) || 0;
         maxWidth = round(min(options.maxWidth / scaleX || 1<<24, imgWidth));
         maxHeight = round(min(options.maxHeight / scaleY || 1<<24, imgHeight));
 
+        // 解决兼容性问题
         if ($().jquery == '1.3.2' && position == 'fixed' &&
             !docElem['getBoundingClientRect'])
         {
@@ -219,7 +227,9 @@ $.imgAreaSelect = function (img, options) {
         x2 = viewX(selection.x2); y2 = viewY(selection.y2);
     }
 
+    // 隐藏调用的方法
     function hide($elem, fn) {
+        // 淡入淡出的效果
         options.fadeSpeed ? $elem.fadeOut(options.fadeSpeed, fn) : $elem.hide();
 
     }
