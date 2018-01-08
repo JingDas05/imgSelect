@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片标注</title>
+    <link rel="stylesheet" type="text/css" href="../lib/css/imgareaselect-default.css" />
+    <script type="text/javascript" src="../lib/scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/scripts/jquery.imgareaselect.pack.js"></script>
+</head>
+<body>
+<div>
+    <img id="photo" src="08f790529822720eb83f561771cb0a46f31fab6e.jpg">
+</div>
+
+
+</body>
+<script type="text/javascript">
+    function handle(img, selection) {
+        console.log(img)
+        console.log(selection)
+    }
+    $(document).ready(function () {
+        var ias = $('img#photo').imgAreaSelect({handles: true, onSelectEnd : handle, instance: true});
+        console.log(ias)
+    });
+</script>
+</html>
