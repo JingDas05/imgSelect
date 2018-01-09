@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>图片标注</title>
-    <link rel="stylesheet" type="text/css" href="../lib/css/imgareaselect-default.css" />
-    <script type="text/javascript" src="../lib/scripts/jquery.min.js"></script>
-    <script type="text/javascript" src="../lib/scripts/jquery.imgareaselect.pack.js"></script>
+    <link rel="stylesheet" type="text/css" href="../lib/css/imgareaselect-default.css"/>
+    <link rel="stylesheet" type="text/css" href="../lib/css/jquery-ui.min.css"/>
+    <script type="text/javascript" src="../lib/js/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/js/jquery.imgareaselect.pack.js"></script>
+    <script type="text/javascript" src="../lib/js/jquery-ui.min.js"></script>
 </head>
 <body>
 <div>
@@ -17,10 +19,13 @@
 <script type="text/javascript">
     function handle(img, selection) {
         console.log(img)
+        console.log($(img).offset().left)
+        console.log($(img).offset().top)
         console.log(selection)
+        console.log($.fn.jquery);
     }
     $(document).ready(function () {
-        var ias = $('img#photo').imgAreaSelect({handles: true, onSelectEnd : handle, instance: true});
+        var ias = $('img#photo').imgAreaSelect({handles: true, onSelectEnd: handle, instance: true});
         console.log(ias)
     });
 </script>

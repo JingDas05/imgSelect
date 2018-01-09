@@ -33,6 +33,7 @@ $.imgAreaSelect = function (img, options) {
 
         $box = div(),
         $area = div(),
+        // div数组
         $border = div().add(div()).add(div()).add(div()),
         $outer = div().add(div()).add(div()).add(div()),
         $handles = $([]),
@@ -62,6 +63,7 @@ $.imgAreaSelect = function (img, options) {
 
         minWidth, minHeight, maxWidth, maxHeight,
 
+        // 等比例调整
         aspectRatio,
 
         shown,
@@ -76,6 +78,7 @@ $.imgAreaSelect = function (img, options) {
 
         $p, d, i, o, w, h, adjusted;
 
+    // 绝对位置
     function viewX(x) {
         return x + imgOfs.left - parOfs.left;
     }
@@ -84,6 +87,7 @@ $.imgAreaSelect = function (img, options) {
         return y + imgOfs.top - parOfs.top;
     }
 
+    // 相对位置
     function selX(x) {
         return x - imgOfs.left + parOfs.left;
     }
@@ -100,6 +104,7 @@ $.imgAreaSelect = function (img, options) {
         return event.pageY - parOfs.top;
     }
 
+    // 获取选中区域
     function getSelection(noScale) {
         var sx = noScale || scaleX, sy = noScale || scaleY;
 
@@ -111,6 +116,7 @@ $.imgAreaSelect = function (img, options) {
             height: round(selection.y2 * sy) - round(selection.y1 * sy) };
     }
 
+    // 设置选中区域
     function setSelection(x1, y1, x2, y2, noScale) {
         var sx = noScale || scaleX, sy = noScale || scaleY;
 
@@ -125,6 +131,7 @@ $.imgAreaSelect = function (img, options) {
         selection.height = selection.y2 - selection.y1;
     }
 
+    // 调整区域
     function adjust() {
         if (!imgLoaded || !$img.width())
             return;
@@ -234,6 +241,7 @@ $.imgAreaSelect = function (img, options) {
 
     }
 
+    // 鼠标移动
     function areaMouseMove(event) {
         var x = selX(evX(event)) - selection.x1,
             y = selY(evY(event)) - selection.y1;
