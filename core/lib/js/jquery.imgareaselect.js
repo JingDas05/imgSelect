@@ -40,6 +40,7 @@
 
             $areaOpera,
 
+            // 去除border后的图片左顶点位置
             left, top,
 
             imgOfs = {left: 0, top: 0},
@@ -68,6 +69,7 @@
 
             shown,
 
+            // 区域初始位置x1, y1，  结束位置 x2, y2
             x1, y1, x2, y2,
 
             selection = {x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0},
@@ -133,7 +135,7 @@
             selection.height = selection.y2 - selection.y1;
         }
 
-        // 调整区域
+        // 调整，imgOfs，imgWidth，imgHeight，left， top等参数
         function adjust() {
             if (!imgLoaded || !$img.width())
                 return;
@@ -182,7 +184,7 @@
                 doResize();
         }
 
-        // 选择边框时更新样式
+        // 选择区域时更新样式
         function update(resetKeyPress) {
             if (!shown) return;
 
@@ -362,10 +364,12 @@
                 }
         }
 
+        // 重新调整大小（x1，y1，x2，y2）
         function doResize() {
             x1 = min(x1, left + imgWidth);
             y1 = min(y1, top + imgHeight);
 
+            // 处理小于最小选择区域的情况
             if (abs(x2 - x1) < minWidth) {
                 x2 = x1 - minWidth * (x2 < x1 || -1);
 
@@ -389,6 +393,7 @@
 
             fixAspectRatio(abs(x2 - x1) < abs(y2 - y1) * aspectRatio);
 
+            // 处理大于最大距离的情况
             if (abs(x2 - x1) > maxWidth) {
                 x2 = x1 - maxWidth * (x2 < x1 || -1);
                 fixAspectRatio();
@@ -406,11 +411,13 @@
             };
 
             update();
-
+            // 调用change方法
             options.onSelectChange(img, getSelection());
         }
 
+        // 鼠标移动事件
         function selectingMouseMove(event) {
+            // 根据是都等比例一定移动
             x2 = /w|e|^$/.test(resize) || aspectRatio ? evX(event) : viewX(selection.x2);
             y2 = /n|s|^$/.test(resize) || aspectRatio ? evY(event) : viewY(selection.y2);
 
@@ -484,7 +491,7 @@
             }
         }
 
-        // 处理图片鼠标点击事件
+        // 处理图片鼠标点击事件，用户把鼠标移动一个像素，就会发生一次 mousemove 事件，就会调用一个函数
         function imgMouseDown(event) {
             // 动画元素或者不是鼠标左键点击的，鼠标左键1，中键2，右键3
             if (event.which != 1 || $outer.is(':animated')) return false;
@@ -655,9 +662,10 @@
             if (newOptions.keys)
                 options.keys = $.extend({shift: 1, ctrl: 'resize'},
                     newOptions.keys);
-
+            // 设置蒙版和选中区样式
             $outer.addClass(options.classPrefix + '-outer');
             $area.addClass(options.classPrefix + '-selection');
+            // 添加边框样式
             for (i = 0; i++ < 4;)
                 $($border[i - 1]).addClass(options.classPrefix + '-border' + i);
 
