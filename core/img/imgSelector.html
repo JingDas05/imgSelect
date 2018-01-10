@@ -5,25 +5,24 @@
     <title>图片标注系统</title>
     <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="js/imgSelector.js"></script>
+    <script type="text/javascript" src="js/svg.js"></script>
 </head>
 <body>
 <div style="text-align: center">
     <p>图片标注系统</p>
     <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg">
     <div id="panel">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width: 500px;height: 500px; text-align: center">
-            <polygon id="polygon_"
-                     points="180,10 280,10 280,200 180,200"
-                     style="fill: none; stroke: black; stroke-width: 2"/>
-        </svg>
     </div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $(function () {
-            var imgSelect = new imgSelector('#img-bg', map)
+//    window.onload = function () {
+//        var imgSelect = new imgSelector(document.getElementById('img-bg'))
+//    };
+        $(document).ready(function () {
+            $(function () {
+                var imgSelect = new imgSelector('#img-bg')
+            });
         });
-    });
 </script>
 </body>
 </html>
