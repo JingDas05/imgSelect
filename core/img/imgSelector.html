@@ -14,14 +14,18 @@
 <body>
 <div style="text-align: center">
     <p>图片标注系统</p>
-    <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg">
-    <div id="panel">
+    <div>
+        <div id="panel" style="position: absolute; right: 800px"></div>
+        <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg" style="z-index: -1; position: absolute; right: 800px">
+        <div id="labels" style="border: solid;width: 300px; height: auto; float: right; margin-right: 200px">
+            <p>标签列表</p>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
-//        window.onload = function () {
-//            var imgSelect = new imgSelector(document.getElementById('img-bg'))
-//        };
+    //        window.onload = function () {
+    //            var imgSelect = new imgSelector(document.getElementById('img-bg'))
+    //        };
     $(document).ready(function () {
         $(function () {
             var imgSelect = new imgSelector('#img-bg')
