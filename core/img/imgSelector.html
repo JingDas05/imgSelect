@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>图片标注系统</title>
+    <!--<link type="text/css" rel="stylesheet" href="css/svg.select.css"/>-->
     <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="js/imgSelector.js"></script>
     <script type="text/javascript" src="js/svg.js"></script>
+    <script type="text/javascript" src="js/svg.select.js"></script>
+    <script type="text/javascript" src="js/svg.resize.js"></script>
+    <script type="text/javascript" src="js/svg.draggable.js"></script>
 </head>
 <body>
 <div style="text-align: center">
@@ -15,14 +19,14 @@
     </div>
 </div>
 <script type="text/javascript">
-//    window.onload = function () {
-//        var imgSelect = new imgSelector(document.getElementById('img-bg'))
-//    };
-        $(document).ready(function () {
-            $(function () {
-                var imgSelect = new imgSelector('#img-bg')
-            });
+//        window.onload = function () {
+//            var imgSelect = new imgSelector(document.getElementById('img-bg'))
+//        };
+    $(document).ready(function () {
+        $(function () {
+            var imgSelect = new imgSelector('#img-bg')
         });
+    });
 </script>
 </body>
 </html>

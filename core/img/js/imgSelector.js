@@ -6,68 +6,34 @@ var imgSelector = function (imgId, options) {
     var
         // 当前加载图片
         img,
-        areaMap;
-
-    // 顶点进入处理器
-    function pointMouseEnter(event) {
-        console.log('顶点进入处理器')
-    }
-
-    // 顶点选择处理器
-    function pointMouseDown(event) {
-        console.log('顶点选择处理器')
-    }
-
-    // 顶点移动处理器
-    function pointMouseMove(event) {
-        console.log('顶点移动处理器')
-    }
-
-    // 顶点确定处理器
-    function pointMouseUp(event) {
-        console.log('顶点确定处理器')
-    }
-
-    // area区域进入处理器
-    function areaMouseEnter(polygonId) {
-        console.log('area区域进入处理器' + polygonId)
-    }
-
-    // area区域选择处理器
-    function areaMouseDown(polygonId) {
-        console.log('area区域选择处理器' + polygonId)
-    }
-
-    // area区域移动处理器
-    function areaMouseMove(polygonId) {
-        console.log('area区域移动处理器' + polygonId)
-    }
-
-    // area区域确定处理器
-    function areaMouseUp(polygonId) {
-        console.log('area区域确定处理器' + polygonId)
-    }
+        areaMap,
+        draw;
 
     // 创建多边形
-    function createPolygon() {
-        var draw = SVG('panel').size(1000, 1000);
-        var polygon = draw.polygon('180,10 280,10 280,200 180,200').fill('black').stroke({width: 2});
-        // 获取多边形id
-        var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
-        // 注册事件处理器（提取方法会报错）
-        polygon.on('mouseover', function () {
-            // this 为当前元素
-            this.fill({color: '#f06'});
-            this.plot([[160, 10], [280, 10], [260, 200], [180, 200]]);
+    function createPolygon1() {
+        var polygon = draw.polygon('180,10 280,10 280,200 180,200').fill('none').stroke({width: 2});
+        // 允许选择和拖动
+        polygon.selectize({deepSelect: true}).resize();
+        // 允许拖动
+        polygon.draggable(true);
+        // 注册resize完成事件
+        polygon.on('resizedone', function () {
+            // this 代表当前元素
+            console.log(this.node.attributes.getNamedItem('points'));
         });
-        // polygon.on('mousedown', areaMouseDown(polygonId));
-        // polygon.on('mousemove', areaMouseMove(polygonId));
-        // polygon.on('mouseup', areaMouseUp(polygonId));
-        // console.log(polygon.node.attributes.getNamedItem('points'));
     }
 
-    // 改变多边形属性
-    function changePolygon() {
+    function createPolygon2() {
+        var polygon = draw.polygon('160,20 260,20 260,200 160,200').fill('none').stroke({width: 2});
+        // 允许选择和拖动
+        polygon.selectize({deepSelect: true}).resize();
+        // 允许拖动
+        polygon.draggable(true);
+        // 注册resize完成事件
+        polygon.on('resizedone', function () {
+            // this 代表当前元素
+            console.log(this.node.attributes.getNamedItem('points'));
+        });
     }
 
     // 自定义Map,存储所选区域
@@ -191,22 +157,26 @@ var imgSelector = function (imgId, options) {
             }
             return arr;
         };
-    };
+    }
 
     function init() {
-        // 初始化图片
+        // 初始化图片并且获取图片真实宽度和高度
         img = $(imgId);
+        var theImage = new Image();
+        theImage.src = img.attr( "src");
         // img = imgId;
         // 初始化区域存储map
         areaMap = new Map();
-        createPolygon();
+        // 初始化画板
+        draw = new SVG('panel').size(theImage.width, theImage.height);
+        createPolygon1();
+        createPolygon2();
     }
 
     // 删除area
     function deleteArea() {
 
     }
-
 
     init()
 };
