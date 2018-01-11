@@ -16,21 +16,22 @@ var imgSelector = function (imgId, options) {
     // 创建多边形
     function polygonHandler() {
         var polygon = draw.polygon()
-            .plot([[180,10], [280,10], [280,200], [180,200]])
+            .plot([[180, 10], [280, 10], [280, 200], [180, 200]])
             .fill('none').stroke({width: 2});
         var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
         // 配置区域选择最大区域,允许选择和拖动
+        var constraint = {
+            minX: 0,
+            minY: 0,
+            maxX: img.width,
+            maxY: img.height
+        };
         var opt = {
-            constraint: {
-                minX: 0,
-                minY: 0,
-                maxX: img.width,
-                maxY: img.height
-            }
+            constraint: constraint
         };
         polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
-        polygon.draggable(true);
+        polygon.draggable(constraint);
         // 将多边形添加到areaMap中
         areaMap.put(polygonId, polygon);
         // 构造标签数据
@@ -40,14 +41,31 @@ var imgSelector = function (imgId, options) {
             polygonId: polygonId
         };
         labelDataMap.put(polygonId, labelData);
-        // 注册事件，（回调函数没有提取出来，提取好像会报错）
-        polygon.on('resizedone', function () {
-            // this 代表当前元素
-            console.log(this.node.attributes.getNamedItem('points'));
-            console.log(polygonId);
+        // 注册事件
+        pointMoveEventHandler(polygon);
+        areaMoveEventHandler(polygon)
+    }
+
+    //边线移动事件
+    function areaMoveEventHandler(element) {
+        element.on('mouseover', function () {
+            this.style('cursor:move')
+        });
+        element.on('mousemove', function () {
+            this.style('cursor:move')
         });
     }
 
+    //顶点移动事件
+    function pointMoveEventHandler(element) {
+        // 注册调整区域完毕事件
+        element.on('resizedone', function () {
+            // this 代表当前元素
+            console.log(this.node.attributes.getNamedItem('points'));
+        });
+    }
+
+    // 删除区域
     function removeArea(element) {
         if (!!element) {
             // 移除以及顶点
@@ -215,6 +233,7 @@ var imgSelector = function (imgId, options) {
 
 imgSelector.prototype = {
 
+    // 公用办法
     something: function () {
 
     }

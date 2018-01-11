@@ -1,29 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>图片标注系统</title>
-    <!--<link type="text/css" rel="stylesheet" href="css/svg.select.css"/>-->
-    <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
-    <script type="text/javascript" src="js/imgSelector.js"></script>
-    <!--svg绘制图形库-->
-    <script type="text/javascript" src="js/svg.js"></script>
-    <script type="text/javascript" src="js/svg.select.js"></script>
-    <script type="text/javascript" src="js/svg.resize.js"></script>
-    <script type="text/javascript" src="js/svg.draggable.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/svg.select.css"/>
+    <link type="text/css" rel="stylesheet" href="layui/css/layui.css"/>
 </head>
 <body>
 <div style="text-align: center">
     <p>图片标注系统</p>
     <div>
         <div id="panel" style="position: absolute; right: 800px"></div>
-        <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg" style="z-index: -1; position: absolute; right: 800px">
+        <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg"
+             style="z-index: -1; position: absolute; right: 800px">
         <div id="labels" style="border: solid;width: 300px; height: auto; float: right; margin-right: 200px">
             <p>标签列表</p>
         </div>
         <button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 20px">添加多边形</button>
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon">&#xe654;</i>
+            </button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon">&#xe642;</i>
+            </button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon">&#xe640;</i>
+            </button>
+        </div>
     </div>
 </div>
+<script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+<script type="text/javascript" src="js/imgSelector.js"></script>
+<!--svg绘制图形库-->
+<script type="text/javascript" src="js/svg.js"></script>
+<script type="text/javascript" src="js/svg.select.js"></script>
+<script type="text/javascript" src="js/svg.resize.js"></script>
+<script type="text/javascript" src="js/svg.draggable.js"></script>
+<script type="text/javascript" src="layui/layui.all.js"></script>
 <script type="text/javascript">
     //        window.onload = function () {
     //            var imgSelect = new imgSelector(document.getElementById('img-bg'))
