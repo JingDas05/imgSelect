@@ -7,27 +7,41 @@ var imgSelector = function (imgId, options) {
         // 当前加载图片
         img,
         areaMap,
+        labelDataMap,
         draw,
         // 官方标签库
         officialLabels = ['绿萝', '仙人掌', '虎皮兰', '多肉', '竹'];
 
 
     // 创建多边形
-    function createPolygon1() {
-        var polygon = draw.polygon('180,10 280,10 280,200 180,200').fill('none').stroke({width: 2});
+    function polygonHandler() {
+        var polygon = draw.polygon()
+            .plot([[180,10], [280,10], [280,200], [180,200]])
+            .fill('none').stroke({width: 2});
         var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
-        // 允许选择和拖动
-        polygon.selectize({deepSelect: true}).resize();
+        // 配置区域选择最大区域,允许选择和拖动
+        var opt = {
+            constraint: {
+                minX: 0,
+                minY: 0,
+                maxX: img.width,
+                maxY: img.height
+            }
+        };
+        polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
         polygon.draggable(true);
-
-        // 测试引用操作
+        // 将多边形添加到areaMap中
         areaMap.put(polygonId, polygon);
-        var storedPolygon = areaMap.get(polygonId);
-        console.log(storedPolygon.array().value);
-        // 移除以及顶点
-        // 注册resize完成事件
-        storedPolygon.on('resizedone', function () {
+        // 构造标签数据
+        var labelData = {
+            label: '',
+            points: polygon.array().value,
+            polygonId: polygonId
+        };
+        labelDataMap.put(polygonId, labelData);
+        // 注册事件，（回调函数没有提取出来，提取好像会报错）
+        polygon.on('resizedone', function () {
             // this 代表当前元素
             console.log(this.node.attributes.getNamedItem('points'));
             console.log(polygonId);
@@ -47,20 +61,12 @@ var imgSelector = function (imgId, options) {
         }
     }
 
-    // function createPolygon2() {
-    //     var polygon = draw.polygon('160,20 260,20 260,200 160,200').fill('none').stroke({width: 2});
-    //     var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue
-    //     // 允许选择和拖动
-    //     polygon.selectize({deepSelect: true}).resize();
-    //     // 允许拖动
-    //     polygon.draggable(true);
-    //     // 注册resize完成事件
-    //     polygon.on('resizedone', function () {
-    //         // this 代表当前元素
-    //         console.log(this.node.attributes.getNamedItem('points'));
-    //         console.log(polygonId);
-    //     });
-    // }
+    // 添加多边形
+    function areaAddListener() {
+        $('#addAreaButton').click(function () {
+            polygonHandler();
+        })
+    }
 
     // 自定义Map,存储所选区域
     function Map() {
@@ -185,18 +191,23 @@ var imgSelector = function (imgId, options) {
         };
     }
 
+    // 初始化图片信息，img为图片id
+    function imgInit(imgId) {
+        var theImage = new Image();
+        theImage.src = $(imgId).attr("src");
+        img = theImage;
+    }
+
     function init() {
         // 初始化图片并且获取图片真实宽度和高度
-        img = $(imgId);
-        var theImage = new Image();
-        theImage.src = img.attr("src");
-        // img = imgId;
+        imgInit(imgId);
         // 初始化区域存储map
         areaMap = new Map();
+        // 初始化dataMap
+        labelDataMap = new Map();
         // 初始化画板
-        draw = new SVG('panel').size(theImage.width, theImage.height);
-        createPolygon1();
-        // createPolygon2();
+        draw = new SVG('panel').size(img.width, img.height);
+        areaAddListener();
     }
 
     init()
