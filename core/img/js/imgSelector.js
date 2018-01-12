@@ -15,7 +15,6 @@ var imgSelector = function (imgId, options) {
         //         'points':[[],[],[],[]]
         //         'elementId':''
         //     }
-        //
         // }
         labelDataMap,
         draw,
