@@ -66,27 +66,52 @@ var imgSelector = function (imgId, options) {
         };
         labelDataMap.put(polygonId, labelData);
         // 注册事件
+        // 顶点移动处理器
         pointMoveEventHandler(polygon);
+        // 区域移动处理器
         areaMoveEventHandler(polygon);
-        labelViewHandler(polygon)
+        // 区域操作处理器
+        areaOperateHandler(polygon)
     }
 
-    //鼠标悬浮状态
+    // 顶点移动处理器
+    function pointMoveEventHandler(element) {
+        // 注册调整区域完毕事件
+        element.on('resizedone', function () {
+            // this 代表当前元素,更新区域坐标
+            // console.log(this.node.attributes.getNamedItem('points'));
+            updateElementPoints(this)
+        });
+    }
+
+    // 区域移动处理器
     function areaMoveEventHandler(element) {
         element.on('mouseover', function () {
             // 鼠标变成移动图标
             this.style('cursor:move');
         });
+        element.on('dragend', function () {
+            // this 代表当前元素,更新区域坐标
+            updateElementPoints(this)
+        })
     }
 
-    // 鼠标移除处理器
-    function labelViewHandler(element) {
+    // 更新labelMap坐标信息
+    function updateElementPoints(element) {
+        var elementId = element.node.attributes.getNamedItem('id').nodeValue;
+        var labelDate = labelDataMap.get(elementId);
+        labelDate.points = element.array().value;
+        console.log(labelDate);
+    }
+
+    // 区域操作处理器
+    function areaOperateHandler(element) {
+        // 双击打开标签
         element.on('dblclick', function () {
-            // 更新标签操作面板
+            // 渲染标签
             updateLabelTemplate(this.node.attributes.getNamedItem('id').nodeValue);
         });
     }
-
 
     // 渲染标签
     function updateLabelTemplate(elementId) {
@@ -131,15 +156,6 @@ var imgSelector = function (imgId, options) {
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
-        });
-    }
-
-    //顶点移动事件
-    function pointMoveEventHandler(element) {
-        // 注册调整区域完毕事件
-        element.on('resizedone', function () {
-            // this 代表当前元素
-            console.log(this.node.attributes.getNamedItem('points'));
         });
     }
 
