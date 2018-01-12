@@ -15,7 +15,7 @@
         <button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 250px">添加多边形</button>
         <!--模板引擎渲染标签以及标签操作-->
         <div id="labelView"></div>
-        <div id="labelsView"></div>
+        <div id="labelsView" style="margin-left: 1200px;width: 200px"></div>
     </div>
 </div>
 <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
@@ -41,7 +41,7 @@
 <script id="labelTemplate" type="text/html">
     <h3>{{ d.currentLabel }}</h3>
     <div class="layui-btn-group">
-        <button class="layui-btn layui-btn-primary layui-btn-sm">
+        <button id="editLabelButton" class="layui-btn layui-btn-primary layui-btn-sm">
             <i class="layui-icon">&#xe642;</i>
         </button>
         <button id="deleteAreaButton" class="layui-btn layui-btn-primary layui-btn-sm">
@@ -55,16 +55,41 @@
 </script>
 
 <script id="labelsTemplate" type="text/html">
-    <ul>
+    <!--<ul>-->
+        <!--{{# layui.each(d.labels, function(index, item){ }}-->
+        <!--<li>-->
+            <!--<span>{{ item.name }}</span>-->
+        <!--</li>-->
+        <!--{{# }); }}-->
+        <!--{{# if(d.labels.length === 0){ }}-->
+        <!--暂无标签-->
+        <!--{{# } }}-->
+    <!--</ul>-->
+
+    <button id="labelCancel" class="layui-btn layui-btn-primary layui-btn-sm">
+        <i class="layui-icon">&#x1006;</i>
+    </button>
+    <button id="labelConfirm" class="layui-btn layui-btn-primary layui-btn-sm">
+        <i class="layui-icon">&#xe618;</i>
+    </button>
+    <table class="layui-table" lay-skin="line">
+        <colgroup>
+            <col width="200">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>标签</th>
+        </tr>
+        </thead>
+        <tbody>
         {{# layui.each(d.labels, function(index, item){ }}
-        <li>
-            <span>{{ item.name }}</span>
-        </li>
+        <tr class="officialLabel">
+            <td>{{ item.name }}</td>
+            <td id="labelIndex" style="display: none">{{ index }}</td>
+        </tr>
         {{# }); }}
-        {{# if(d.labels.length === 0){ }}
-        暂无标签
-        {{# } }}
-    </ul>
+        </tbody>
+    </table>
 </script>
 
 </body>

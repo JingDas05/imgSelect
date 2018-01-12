@@ -6,11 +6,19 @@ var imgSelector = function (imgId, options) {
     var
         // 当前加载图片
         img,
+        // 保存区域
         areaMap,
+        // 保存标签坐标点，获取数组可以调用 labelDataMap.values()
+        // 结构如下： {
+        //     'elementId':{
+        //         'label':'',
+        //         'points':[[],[],[],[]]
+        //         'elementId':''
+        //     }
+        //
+        // }
         labelDataMap,
         draw,
-        //ui组件
-        // layTemplate,
         // 官方标签库
         officialLabels = [
             {
@@ -62,7 +70,7 @@ var imgSelector = function (imgId, options) {
         var labelData = {
             label: '',
             points: polygon.array().value,
-            polygonId: polygonId
+            elementId: polygonId
         };
         labelDataMap.put(polygonId, labelData);
         // 注册事件
@@ -156,13 +164,32 @@ var imgSelector = function (imgId, options) {
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
+            labelsTemplateHandler()
         });
     }
 
+    // 标签列表处理器
+    function labelsTemplateHandler() {
+        // 取消 -> 隐藏
+        $('button#labelCancel').click(function () {
+            console.log('取消 -> 隐藏');
+            $('#labelsView').hide()
+        });
+
+        // 确认
+        $('button#labelConfirm').click(function () {
+            $('#labelsView').show()
+        })
+    }
 
     // 标签处理器
     function labelTemplateHandler() {
         var elementId = $('#elementId').text();
+        // 处理编辑标签事件
+        $('.officialLabel').click(function () {
+            console.log($(this))
+        });
+        // 处理删除按钮事件
         $('button#deleteAreaButton').click(function () {
             var element = areaMap.get(elementId);
             if (!!element) {
@@ -179,6 +206,7 @@ var imgSelector = function (imgId, options) {
             }
             $('#labelView').hide()
         });
+        // 处理关闭标签事件
         $('button#closeLabelTemplate').click(function () {
             $('#labelView').hide()
         });
@@ -189,6 +217,27 @@ var imgSelector = function (imgId, options) {
         $('#addAreaButton').click(function () {
             polygonHandler();
         })
+    }
+
+    // 初始化图片信息，img为图片id
+    function imgInit(imgId) {
+        var theImage = new Image();
+        theImage.src = $(imgId).attr('src');
+        img = theImage;
+    }
+
+    function init() {
+        // 初始化图片并且获取图片真实宽度和高度
+        imgInit(imgId);
+        // 初始化区域存储map
+        areaMap = new Map();
+        // 初始化dataMap
+        labelDataMap = new Map();
+        // 初始化画板
+        draw = new SVG('panel').size(img.width, img.height);
+        areaAddListener();
+        // 更新标签列表
+        updateLabelsTemplate();
     }
 
     // 自定义Map,存储所选区域
@@ -314,27 +363,6 @@ var imgSelector = function (imgId, options) {
         };
     }
 
-    // 初始化图片信息，img为图片id
-    function imgInit(imgId) {
-        var theImage = new Image();
-        theImage.src = $(imgId).attr('src');
-        img = theImage;
-    }
-
-    function init() {
-        // 初始化图片并且获取图片真实宽度和高度
-        imgInit(imgId);
-        // 初始化区域存储map
-        areaMap = new Map();
-        // 初始化dataMap
-        labelDataMap = new Map();
-        // 初始化画板
-        draw = new SVG('panel').size(img.width, img.height);
-        areaAddListener();
-        // 更新标签列表
-        updateLabelsTemplate();
-    }
-
     init()
 };
 
@@ -342,6 +370,5 @@ imgSelector.prototype = {
 
     // 公用办法
     something: function () {
-
     }
 };
