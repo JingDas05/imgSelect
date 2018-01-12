@@ -81,27 +81,31 @@ var imgSelector = function (imgId, options) {
     }
 
     // 渲染标签
-    function templateApply() {
+    function updateLabelTemplate(elementId) {
         // 初始化UI组件
         layui.use(['laytpl'], function () {
             var layTemplate = layui.laytpl;
             var data = {
-                //数据
-                'currentLabel': '当前标签'
+                // 标签数据
+                'currentLabel': '当前标签',
+                'elementId': elementId
             };
             var
                 // 获取模板
                 template = document.getElementById('labelTemplate').innerHTML,
                 // 获取渲染视图
                 view = document.getElementById('labelView');
+            // 渲染标签模板
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
+            // 渲染后捕捉删除以及编辑操作
+            removeArea();
         });
     }
 
     // 渲染标签列表
-    function labelsTemplateInit() {
+    function updateLabelsTemplate() {
         // 初始化UI组件
         layui.use(['laytpl'], function () {
             var layTemplate = layui.laytpl;
@@ -129,8 +133,13 @@ var imgSelector = function (imgId, options) {
         });
     }
 
-    // 删除区域
-    function removeArea(element) {
+
+    // 删除区域处理器
+    function removeArea(elementId) {
+        $('button#deleteButton').click(function () {
+            console.log('4444')
+        });
+        var element = areaMap.get(elementId);
         if (!!element) {
             // 移除以及顶点
             var childNodes = element.node.nextElementSibling.childNodes;
@@ -290,8 +299,10 @@ var imgSelector = function (imgId, options) {
         // 初始化画板
         draw = new SVG('panel').size(img.width, img.height);
         areaAddListener();
-        templateApply();
-        labelsTemplateInit()
+        // 更新标签操作面板
+        updateLabelTemplate('1111');
+        // 更新标签列表
+        updateLabelsTemplate();
     }
 
     init()
