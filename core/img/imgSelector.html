@@ -56,11 +56,6 @@
 
 <script id="labelsTemplate" type="text/html">
     <!--<ul>-->
-        <!--{{# layui.each(d.labels, function(index, item){ }}-->
-        <!--<li>-->
-            <!--<span>{{ item.name }}</span>-->
-        <!--</li>-->
-        <!--{{# }); }}-->
         <!--{{# if(d.labels.length === 0){ }}-->
         <!--暂无标签-->
         <!--{{# } }}-->
@@ -83,9 +78,9 @@
         </thead>
         <tbody>
         {{# layui.each(d.labels, function(index, item){ }}
-        <tr class="officialLabel">
-            <td>{{ item.name }}</td>
-            <td id="labelIndex" style="display: none">{{ index }}</td>
+        <tr class="officialLabel" style="cursor: pointer">
+            <td id="labelItem">{{ item.name }}</td>
+            <!--<td id="labelIndex" style="display: none">{{ index }}</td>-->
         </tr>
         {{# }); }}
         </tbody>

@@ -58,8 +58,8 @@ var imgSelector = function (imgId, options) {
         };
         var opt = {
             constraint: constraint,
-            snapToGrid: 20,
-            snapToAngle: 15
+            snapToGrid: 10,
+            snapToAngle: 5
         };
         polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
@@ -164,6 +164,8 @@ var imgSelector = function (imgId, options) {
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
+            // 显示标签
+            $('#labelsView').show();
             labelsTemplateHandler()
         });
     }
@@ -178,17 +180,31 @@ var imgSelector = function (imgId, options) {
 
         // 确认
         $('button#labelConfirm').click(function () {
-            $('#labelsView').show()
-        })
+            console.log('确认 -> 隐藏');
+            $('#labelsView').hide()
+        });
+        // 点击标签处理器
+        $('.officialLabel').click(function () {
+            // 获取当前选择的 elementId
+            var elementId = $('#elementId').text();
+            // 获取当前标注的标签数据
+            var label = labelDataMap.get(elementId);
+            // 赋值
+            label.label = $(this).children('#labelItem').text();
+            console.log(label)
+        });
     }
 
     // 标签处理器
     function labelTemplateHandler() {
         var elementId = $('#elementId').text();
+
         // 处理编辑标签事件
-        $('.officialLabel').click(function () {
-            console.log($(this))
+        $('button#editLabelButton').click(function () {
+            // 更新标签列表
+            updateLabelsTemplate();
         });
+
         // 处理删除按钮事件
         $('button#deleteAreaButton').click(function () {
             var element = areaMap.get(elementId);
@@ -236,8 +252,6 @@ var imgSelector = function (imgId, options) {
         // 初始化画板
         draw = new SVG('panel').size(img.width, img.height);
         areaAddListener();
-        // 更新标签列表
-        updateLabelsTemplate();
     }
 
     // 自定义Map,存储所选区域
