@@ -68,17 +68,25 @@ var imgSelector = function (imgId, options) {
         // 注册事件
         pointMoveEventHandler(polygon);
         areaMoveEventHandler(polygon);
+        labelViewHandler(polygon)
     }
 
-    //边线移动事件
+    //鼠标悬浮状态
     function areaMoveEventHandler(element) {
         element.on('mouseover', function () {
-            this.style('cursor:move')
+            // 鼠标变成移动图标
+            this.style('cursor:move');
         });
-        // element.on('mousemove', function () {
-        //     this.style('cursor:move')
-        // });
     }
+
+    // 鼠标移除处理器
+    function labelViewHandler(element) {
+        element.on('dblclick', function () {
+            // 更新标签操作面板
+            updateLabelTemplate(this.node.attributes.getNamedItem('id').nodeValue);
+        });
+    }
+
 
     // 渲染标签
     function updateLabelTemplate(elementId) {
@@ -99,8 +107,10 @@ var imgSelector = function (imgId, options) {
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
-            // 渲染后捕捉删除以及编辑操作
-            removeArea();
+            // 显示标签
+            $('#labelView').show();
+            // 标签处理器
+            labelTemplateHandler();
         });
     }
 
@@ -134,22 +144,28 @@ var imgSelector = function (imgId, options) {
     }
 
 
-    // 删除区域处理器
-    function removeArea(elementId) {
-        $('button#deleteButton').click(function () {
-            console.log('4444')
-        });
-        var element = areaMap.get(elementId);
-        if (!!element) {
-            // 移除以及顶点
-            var childNodes = element.node.nextElementSibling.childNodes;
-            while (childNodes.length > 0) {
-                childNodes.forEach(function (each, index) {
-                    each.remove()
-                });
+    // 标签处理器
+    function labelTemplateHandler() {
+        var elementId = $('#elementId').text();
+        $('button#deleteAreaButton').click(function () {
+            var element = areaMap.get(elementId);
+            if (!!element) {
+                // 移除以及顶点
+                var childNodes = element.node.nextElementSibling.childNodes;
+                while (childNodes.length > 0) {
+                    childNodes.forEach(function (each, index) {
+                        each.remove()
+                    });
+                }
+                element.remove();
+                // map中移除
+                areaMap.remove(elementId)
             }
-            element.remove();
-        }
+            $('#labelView').hide()
+        });
+        $('button#closeLabelTemplate').click(function () {
+            $('#labelView').hide()
+        });
     }
 
     // 添加多边形
@@ -299,8 +315,6 @@ var imgSelector = function (imgId, options) {
         // 初始化画板
         draw = new SVG('panel').size(img.width, img.height);
         areaAddListener();
-        // 更新标签操作面板
-        updateLabelTemplate('1111');
         // 更新标签列表
         updateLabelsTemplate();
     }
