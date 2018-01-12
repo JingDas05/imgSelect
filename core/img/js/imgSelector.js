@@ -122,13 +122,13 @@ var imgSelector = function (imgId, options) {
     }
 
     // 渲染标签
-    function updateLabelTemplate(elementId) {
+    function updateLabelTemplate(elementId, currentLabel) {
         // 初始化UI组件
         layui.use(['laytpl'], function () {
             var layTemplate = layui.laytpl;
             var data = {
                 // 标签数据
-                'currentLabel': '当前标签',
+                'currentLabel': currentLabel,
                 'elementId': elementId
             };
             var
@@ -137,6 +137,10 @@ var imgSelector = function (imgId, options) {
                 // 获取渲染视图
                 view = document.getElementById('labelView');
             // 渲染标签模板
+            // 如果刚进来没有标签，显示暂无标签，请标注
+            if (!data.currentLabel) {
+                data.currentLabel = '暂无标签，请标注'
+            }
             layTemplate(template).render(data, function (renderedHtml) {
                 view.innerHTML = renderedHtml;
             });
@@ -191,6 +195,8 @@ var imgSelector = function (imgId, options) {
             var label = labelDataMap.get(elementId);
             // 赋值
             label.label = $(this).children('#labelItem').text();
+            // 更新标签
+            updateLabelTemplate(elementId, label.label);
             console.log(label)
         });
     }
