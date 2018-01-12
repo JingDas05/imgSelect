@@ -13,21 +13,10 @@
         <div id="panel" style="position: absolute; right: 800px"></div>
         <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg"
              style="z-index: -1; position: absolute; right: 800px">
-        <div id="labels" style="border: solid;width: 300px; height: auto; float: right; margin-right: 200px">
-            <p>标签列表</p>
-        </div>
-        <button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 20px">添加多边形</button>
-        <div class="layui-btn-group">
-            <button class="layui-btn layui-btn-primary layui-btn-sm">
-                <i class="layui-icon">&#xe654;</i>
-            </button>
-            <button class="layui-btn layui-btn-primary layui-btn-sm">
-                <i class="layui-icon">&#xe642;</i>
-            </button>
-            <button class="layui-btn layui-btn-primary layui-btn-sm">
-                <i class="layui-icon">&#xe640;</i>
-            </button>
-        </div>
+        <button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 250px">添加多边形</button>
+        <!--模板引擎渲染标签以及标签操作-->
+        <div id="labelView"></div>
+        <div id="labelsView"></div>
     </div>
 </div>
 <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
@@ -37,7 +26,7 @@
 <script type="text/javascript" src="js/svg.select.js"></script>
 <script type="text/javascript" src="js/svg.resize.js"></script>
 <script type="text/javascript" src="js/svg.draggable.js"></script>
-<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript" src="layui/layui.js"></script>
 <script type="text/javascript">
     //        window.onload = function () {
     //            var imgSelect = new imgSelector(document.getElementById('img-bg'))
@@ -48,5 +37,32 @@
         });
     });
 </script>
+
+<!--使用模板引擎绑定标签操作，悬浮时弹出的标签以及操作框-->
+<script id="labelTemplate" type="text/html">
+    <h3>{{ d.currentLabel }}</h3>
+    <div class="layui-btn-group">
+        <button class="layui-btn layui-btn-primary layui-btn-sm">
+            <i class="layui-icon">&#xe642;</i>
+        </button>
+        <button class="layui-btn layui-btn-primary layui-btn-sm">
+            <i class="layui-icon">&#xe640;</i>
+        </button>
+    </div>
+</script>
+
+<script id="labelsTemplate" type="text/html">
+    <ul>
+        {{# layui.each(d.labels, function(index, item){ }}
+        <li>
+            <span>{{ item.name }}</span>
+        </li>
+        {{# }); }}
+        {{# if(d.labels.length === 0){ }}
+        暂无标签
+        {{# } }}
+    </ul>
+</script>
+
 </body>
 </html>

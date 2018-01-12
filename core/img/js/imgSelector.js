@@ -9,8 +9,30 @@ var imgSelector = function (imgId, options) {
         areaMap,
         labelDataMap,
         draw,
+        //ui组件
+        // layTemplate,
         // 官方标签库
-        officialLabels = ['绿萝', '仙人掌', '虎皮兰', '多肉', '竹'];
+        officialLabels = [
+            {
+                'id': '',
+                'name': '绿萝'
+            },
+            {
+                'id': '',
+                'name': '仙人掌'
+            }, {
+                'id': '',
+                'name': '虎皮兰'
+            },
+            {
+                'id': '',
+                'name': '多肉'
+            },
+            {
+                'id': '',
+                'name': '竹'
+            }
+        ];
 
 
     // 创建多边形
@@ -27,7 +49,9 @@ var imgSelector = function (imgId, options) {
             maxY: img.height
         };
         var opt = {
-            constraint: constraint
+            constraint: constraint,
+            snapToGrid: 20,
+            snapToAngle: 15
         };
         polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
@@ -43,7 +67,7 @@ var imgSelector = function (imgId, options) {
         labelDataMap.put(polygonId, labelData);
         // 注册事件
         pointMoveEventHandler(polygon);
-        areaMoveEventHandler(polygon)
+        areaMoveEventHandler(polygon);
     }
 
     //边线移动事件
@@ -51,8 +75,48 @@ var imgSelector = function (imgId, options) {
         element.on('mouseover', function () {
             this.style('cursor:move')
         });
-        element.on('mousemove', function () {
-            this.style('cursor:move')
+        // element.on('mousemove', function () {
+        //     this.style('cursor:move')
+        // });
+    }
+
+    // 渲染标签
+    function templateApply() {
+        // 初始化UI组件
+        layui.use(['laytpl'], function () {
+            var layTemplate = layui.laytpl;
+            var data = {
+                //数据
+                'currentLabel': '当前标签'
+            };
+            var
+                // 获取模板
+                template = document.getElementById('labelTemplate').innerHTML,
+                // 获取渲染视图
+                view = document.getElementById('labelView');
+            layTemplate(template).render(data, function (renderedHtml) {
+                view.innerHTML = renderedHtml;
+            });
+        });
+    }
+
+    // 渲染标签列表
+    function labelsTemplateInit() {
+        // 初始化UI组件
+        layui.use(['laytpl'], function () {
+            var layTemplate = layui.laytpl;
+            var data = {
+                'labels': officialLabels
+            };
+            var
+                // 获取模板
+                template = document.getElementById('labelsTemplate').innerHTML,
+                // 获取渲染视图
+                view = document.getElementById('labelsView');
+            // 渲染
+            layTemplate(template).render(data, function (renderedHtml) {
+                view.innerHTML = renderedHtml;
+            });
         });
     }
 
@@ -212,7 +276,7 @@ var imgSelector = function (imgId, options) {
     // 初始化图片信息，img为图片id
     function imgInit(imgId) {
         var theImage = new Image();
-        theImage.src = $(imgId).attr("src");
+        theImage.src = $(imgId).attr('src');
         img = theImage;
     }
 
@@ -226,6 +290,8 @@ var imgSelector = function (imgId, options) {
         // 初始化画板
         draw = new SVG('panel').size(img.width, img.height);
         areaAddListener();
+        templateApply();
+        labelsTemplateInit()
     }
 
     init()
