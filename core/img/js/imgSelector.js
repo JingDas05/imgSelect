@@ -41,7 +41,13 @@ var imgSelector = function (imgId, options) {
             }
         ],
         // 画图相关参数，调整时isResize必须为true,拖动时isDrag必须为true,之后置位清零
-        x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false;
+        x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false,
+        colorOptions = {
+            fill: '#B0C4DE',
+            'fill-opacity': 0.3,
+            stroke: '#000',
+            'stroke-width': 1
+        };
 
     // 清除画图点
     function clearDrawPositon() {
@@ -59,9 +65,9 @@ var imgSelector = function (imgId, options) {
             return
         }
         var polygon = draw.polygon()
-            .plot(points)
-            .fill('none').stroke({width: 2});
+            .plot(points).attr(colorOptions);
 
+        // 使用查件会报错，自己写画图
         // var pointsNum = 0;
         // // 开启绘制多边形
         // var polygon = draw.polygon().fill('none').stroke({width: 2}).draw();
@@ -131,10 +137,6 @@ var imgSelector = function (imgId, options) {
             // 屏蔽画图
             isDrag = true;
         });
-        element.on('mouseover', function (e) {
-            // 鼠标变成移动图标
-            this.style('cursor:move');
-        });
         element.on('dragend', function () {
             // this 代表当前元素,更新区域坐标
             updateElementPoints(this)
@@ -165,6 +167,19 @@ var imgSelector = function (imgId, options) {
                 // 渲染标签
                 updateLabelTemplate(polygonId);
             }
+        });
+        // 样式优化
+        element.on('mouseover', function () {
+            // 焦点时改变颜色
+            this.style('cursor:move');
+            this.attr({
+                'fill': '#FF8C00',
+                'fill-opacity': 0.5
+            });
+        });
+        element.on('mouseout', function () {
+            // 还原默认显示
+            this.attr(colorOptions);
         });
     }
 
