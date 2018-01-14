@@ -1,7 +1,7 @@
 /**
  * @author wusi
  */
-var imgSelector = function (imgId, options) {
+var imgSelector = function (imgId, officialLabelsDefine, options) {
 
     var
         // 当前加载图片
@@ -19,27 +19,27 @@ var imgSelector = function (imgId, options) {
         labelDataMap,
         draw,
         // 官方标签库
-        officialLabels = [
-            {
-                'id': '',
-                'name': '绿萝'
-            },
-            {
-                'id': '',
-                'name': '仙人掌'
-            }, {
-                'id': '',
-                'name': '虎皮兰'
-            },
-            {
-                'id': '',
-                'name': '多肉'
-            },
-            {
-                'id': '',
-                'name': '竹'
-            }
-        ],
+        officialLabels = officialLabelsDefine || [
+                {
+                    'id': '',
+                    'name': '绿萝'
+                },
+                {
+                    'id': '',
+                    'name': '仙人掌'
+                }, {
+                    'id': '',
+                    'name': '虎皮兰'
+                },
+                {
+                    'id': '',
+                    'name': '多肉'
+                },
+                {
+                    'id': '',
+                    'name': '竹'
+                }
+            ],
         // 画图相关参数，调整时isResize必须为true,拖动时isDrag必须为true,之后置位清零
         x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false,
         colorOptions = {
@@ -66,21 +66,8 @@ var imgSelector = function (imgId, options) {
         }
         var polygon = draw.polygon()
             .plot(points).attr(colorOptions);
-
-        // 使用查件会报错，自己写画图
-        // var pointsNum = 0;
-        // // 开启绘制多边形
-        // var polygon = draw.polygon().fill('none').stroke({width: 2}).draw();
-        // // 目前只能画四个点
-        // polygon.on('drawpoint', function () {
-        //     console.log('drawpoint');
-        //     pointsNum++;
-        //     if (pointsNum === 3) {
-        //         polygon.draw('done');
-        //     }
-        // });
-
         var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
+        console.log(polygon);
         // 配置区域选择最大区域,允许选择和拖动
         var constraint = {
             minX: 0,
@@ -158,11 +145,16 @@ var imgSelector = function (imgId, options) {
         // 右键点击打开标签等
         var polygonId = element.node.attributes.getNamedItem('id').nodeValue;
         $('#' + polygonId).mousedown(function (event) {
-            //阻止浏览器默认右键点击事件
+            // 阻止浏览器默认右键点击事件
             $(this).bind("contextmenu", function () {
                 return false;
             });
             if (3 == event.which) {
+                // 获取点击位置绝对坐标
+                $('#labelView').css({
+                    'left': event.screenX,
+                    'top': event.screenY
+                });
                 // 渲染标签
                 updateLabelTemplate(polygonId);
             }
@@ -210,7 +202,6 @@ var imgSelector = function (imgId, options) {
             });
             // 显示标签
             $('#labelView').show();
-            $('#custom-label').show();
             // 标签处理器
             labelTemplateHandler();
         });
@@ -219,23 +210,6 @@ var imgSelector = function (imgId, options) {
     // 标签处理器
     function labelTemplateHandler() {
         var elementId = $('#elementId').text();
-        // 处理自定义标签
-        layui.use(['form'], function () {
-            var form = layui.form;
-            // 监听提交
-            form.on('submit(label)', function (data) {
-                // 获取自定义标签，并且刷新当前标签值
-                refreshCurrentLabel(data.field.name);
-                return false;
-            });
-        });
-
-        // 处理编辑标签事件
-        // $('button#editLabelButton').click(function () {
-        //     // 更新标签列表
-        //     updateLabelsTemplate();
-        // });
-
         // 处理删除按钮事件
         $('button#deleteAreaButton').click(function () {
             var element = areaMap.get(elementId);
@@ -258,20 +232,16 @@ var imgSelector = function (imgId, options) {
         $('button#closeLabelTemplate').click(function () {
             $('#labelView').hide()
         });
-
-        // 标签列表处理器
-        // 取消 -> 隐藏
-        $('button#labelCancel').click(function () {
-            console.log('取消 -> 隐藏');
-            $('#labelsView').hide()
-        });
-
-        // 确认
+        // 自定义标签 确认操作
         $('button#labelConfirm').click(function () {
-            // $('#labelsView').hide()
-            refreshCurrentLabel($('#customLabel').val());
+            var customLabel = $('#customLabel').val();
+            if (customLabel) {
+                refreshCurrentLabel(customLabel);
+            }
+            // 隐藏标签面板
+            $('#labelView').hide()
         });
-        // 点击标签处理器
+        // 官方标签点击处理器
         $('.officialLabel').click(function () {
             // 获取获取标签值
             var labelText = $(this).children('#labelItem').text();
@@ -279,17 +249,32 @@ var imgSelector = function (imgId, options) {
         });
     }
 
+    // 获取标注标签最终位置
+    function getSuitablePosition(points) {
+        var Xmin = Math.min(points[0][0], points[1][0], points[2][0], points[3][0]);
+        var Xmax = Math.max(points[0][0], points[1][0], points[2][0], points[3][0]);
+        var Ymin = Math.min(points[0][1], points[1][1], points[2][1], points[3][1]);
+        var Ymax = Math.min(points[0][1], points[1][1], points[2][1], points[3][1]);
+        return {x: (Xmin + Xmax) / 2, y: (Ymin + Ymax) / 2}
+    }
+
     // 刷新当前标签显示值
     function refreshCurrentLabel(labelText) {
         // 获取当前选择的 elementId
         var elementId = $('#elementId').text();
         // 获取element添加标签展示
-        var element = areaMap.get(elementId);
+        // var element = areaMap.get(elementId);
+        // var points = element.array().value;
+        // var suitablePoints = getSuitablePosition(points);
+        // var text = draw.text(labelText);
+        // text.attr({x: suitablePoints.x, y: suitablePoints.y});
+        // console.log(element);
         // 获取当前标注的标签数据
-        console.log(element);
         var label = labelDataMap.get(elementId);
         // 赋值
         label.label = labelText;
+        // 将标签展示到选择框里
+
         // 更新标签
         updateLabelTemplate(elementId, labelText);
     }
@@ -386,7 +371,7 @@ var imgSelector = function (imgId, options) {
                 key: _key,
                 value: _value
             });
-            console.log(this)
+            // console.log(this.values())
         };
 
 
@@ -403,7 +388,7 @@ var imgSelector = function (imgId, options) {
             } catch (e) {
                 bln = false;
             }
-            console.log(this)
+            // console.log(this.values());
             return bln;
         };
 
@@ -483,12 +468,39 @@ var imgSelector = function (imgId, options) {
         };
     }
 
-    init()
+    // 根据点的数组绘制图形
+    function showElementsByPoints(points) {
+        if (points instanceof Array && points) {
+            points.forEach(function (each) {
+                polygonDrawHandler(each.points);
+            })
+        }
+    }
+
+    init();
+
+    this.labelDataMap = labelDataMap;
 };
 
 imgSelector.prototype = {
 
-    // 公用办法
-    something: function () {
+    // 获取标签数据
+    getLabels: function () {
+        var labels = this.labelDataMap.values();
+        var notNullLabels = [];
+        if (labels) {
+            labels.forEach(function (each) {
+                if (each.label) {
+                    notNullLabels.push(each)
+                }
+            })
+        }
+        return notNullLabels;
+    },
+    // 回填标签数据，数据结构为（导出数据)
+    // [{label: "绿萝", points: [[176,122], [255, 122], [255, 209], [176, 209]], elementId: "SvgjsPolygon1008"},{label: "绿萝", points: [[352,196], [416, 196], [416, 288], [352, 288]], elementId: "SvgjsPolygon1008"}]
+    setLabels: function (points) {
+        console.log(points);
+        this.showElementsByPoints(points)
     }
 };

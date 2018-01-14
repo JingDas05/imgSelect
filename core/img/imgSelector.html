@@ -9,26 +9,19 @@
 <body>
 <div style="text-align: center">
     <div>
-        <div id="panel" style="position: absolute; right: 800px; top: 300px"></div>
+        <div id="panel" style="position: absolute; right: 800px; top: 200px"></div>
         <img id="img-bg" src="./08f790529822720eb83f561771cb0a46f31fab6e.jpg"
-             style="z-index: -1; position: absolute; right: 800px; top: 300px">
+             style="z-index: -1; position: absolute; right: 800px; top: 200px">
         <!--<button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 250px">添加多边形</button>-->
         <!--模板引擎渲染标签以及标签操作-->
-        <div id="labelView">
-            <form id="custom-label" class="layui-form" action="" style="display: none">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">自定义标签</label>
-                    <div class="layui-input-inline">
-                        <input id="customLabel" type="text" name="name" autocomplete="off" placeholder="请输入自定义标签"
-                               class="layui-input">
-                    </div>
+        <div id="labelView" style="display: none;width: 310px; position: absolute; background-color: 	#87CEFA;padding: 20px">
+            <div class="layui-form-item">
+                <label class="layui-form-label">自定义标签</label>
+                <div class="layui-input-inline">
+                    <input id="customLabel" type="text" name="name" autocomplete="off" placeholder="请输入自定义标签"
+                           class="layui-input">
                 </div>
-                <!--<div class="layui-form-item">-->
-                    <!--<div class="layui-input-block">-->
-                        <!--<button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="label">确认</button>-->
-                    <!--</div>-->
-                <!--</div>-->
-            </form>
+            </div>
             <div id="option-label"></div>
         </div>
     </div>
@@ -45,7 +38,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $(function () {
-            new imgSelector('#img-bg')
+            result = new imgSelector('#img-bg')
         });
     });
 </script>
