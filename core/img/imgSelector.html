@@ -19,14 +19,15 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">自定义标签</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="name" autocomplete="off" placeholder="请输入自定义标签" class="layui-input">
+                        <input id="customLabel" type="text" name="name" autocomplete="off" placeholder="请输入自定义标签"
+                               class="layui-input">
                     </div>
                 </div>
-                <div class="layui-form-item" >
-                    <div class="layui-input-block">
-                        <button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="label">确认</button>
-                    </div>
-                </div>
+                <!--<div class="layui-form-item">-->
+                    <!--<div class="layui-input-block">-->
+                        <!--<button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="label">确认</button>-->
+                    <!--</div>-->
+                <!--</div>-->
             </form>
             <div id="option-label"></div>
         </div>
@@ -53,9 +54,9 @@
 <script id="labelTemplate" type="text/html">
     <h3>{{ d.currentLabel }}</h3>
     <div class="layui-btn-group">
-        <button id="editLabelButton" class="layui-btn layui-btn-primary layui-btn-sm">
-            <i class="layui-icon">&#xe642;</i>
-        </button>
+        <!--<button id="editLabelButton" class="layui-btn layui-btn-primary layui-btn-sm">-->
+        <!--<i class="layui-icon">&#xe642;</i>-->
+        <!--</button>-->
         <button id="deleteAreaButton" class="layui-btn layui-btn-primary layui-btn-sm">
             <span id="elementId" style="display: none">{{ d.elementId }}</span>
             <i class="layui-icon">&#xe640;</i>

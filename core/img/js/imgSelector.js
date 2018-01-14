@@ -150,7 +150,6 @@ var imgSelector = function (imgId, options) {
         var elementId = element.node.attributes.getNamedItem('id').nodeValue;
         var labelDate = labelDataMap.get(elementId);
         labelDate.points = element.array().value;
-        console.log(labelDate);
     }
 
     // 区域操作处理器
@@ -185,12 +184,14 @@ var imgSelector = function (imgId, options) {
 
     // 渲染标签 elementId：当前元素id, currentLabel:要设置的标签
     function updateLabelTemplate(elementId, currentLabel) {
+        var element = labelDataMap.get(elementId);
+        var storageLabel = currentLabel || (element ? element.label : '');
         // 初始化UI组件
         layui.use(['laytpl'], function () {
-            var layTemplate = layui.laytpl
+            var layTemplate = layui.laytpl;
             var data = {
                 // 标签数据
-                'currentLabel': currentLabel,
+                'currentLabel': storageLabel,
                 'elementId': elementId,
                 'labels': officialLabels
             };
@@ -212,7 +213,6 @@ var imgSelector = function (imgId, options) {
             $('#custom-label').show();
             // 标签处理器
             labelTemplateHandler();
-            // 自定义标签处理
         });
     }
 
@@ -231,10 +231,10 @@ var imgSelector = function (imgId, options) {
         });
 
         // 处理编辑标签事件
-        $('button#editLabelButton').click(function () {
-            // 更新标签列表
-            // updateLabelsTemplate();
-        });
+        // $('button#editLabelButton').click(function () {
+        //     // 更新标签列表
+        //     updateLabelsTemplate();
+        // });
 
         // 处理删除按钮事件
         $('button#deleteAreaButton').click(function () {
@@ -249,7 +249,8 @@ var imgSelector = function (imgId, options) {
                 }
                 element.remove();
                 // map中移除
-                areaMap.remove(elementId)
+                areaMap.remove(elementId);
+                labelDataMap.remove(elementId);
             }
             $('#labelView').hide()
         });
@@ -267,8 +268,8 @@ var imgSelector = function (imgId, options) {
 
         // 确认
         $('button#labelConfirm').click(function () {
-            console.log('确认 -> 隐藏');
-            $('#labelsView').hide()
+            // $('#labelsView').hide()
+            refreshCurrentLabel($('#customLabel').val());
         });
         // 点击标签处理器
         $('.officialLabel').click(function () {
@@ -282,7 +283,10 @@ var imgSelector = function (imgId, options) {
     function refreshCurrentLabel(labelText) {
         // 获取当前选择的 elementId
         var elementId = $('#elementId').text();
+        // 获取element添加标签展示
+        var element = areaMap.get(elementId);
         // 获取当前标注的标签数据
+        console.log(element);
         var label = labelDataMap.get(elementId);
         // 赋值
         label.label = labelText;
@@ -306,6 +310,11 @@ var imgSelector = function (imgId, options) {
             if (0 == event.which && isMouseDown && !isResize && !isDrag) {
                 x2 = event.offsetX;
                 y2 = event.offsetY;
+                // 处理点过小的情况
+                if (x2 - x1 < 20 || y2 - y1 < 20) {
+                    x2 = x1 + 25;
+                    y2 = y2 + 25;
+                }
                 isMouseDown = false;
                 // 渲染标签
                 polygonDrawHandler(getPolygonPointsByCross([[x1, y1], [x2, y2]]));
@@ -377,6 +386,7 @@ var imgSelector = function (imgId, options) {
                 key: _key,
                 value: _value
             });
+            console.log(this)
         };
 
 
@@ -393,6 +403,7 @@ var imgSelector = function (imgId, options) {
             } catch (e) {
                 bln = false;
             }
+            console.log(this)
             return bln;
         };
 
