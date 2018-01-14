@@ -39,7 +39,18 @@ var imgSelector = function (imgId, options) {
                 'id': '',
                 'name': '竹'
             }
-        ];
+        ],
+        // 画图相关参数，调整时isResize必须为true,拖动时isDrag必须为true,之后置位清零
+        x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false;
+
+    // 清除画图点
+    function clearDrawPositon() {
+        x1 = 0;
+        y1 = 0;
+        x2 = 0;
+        y2 = 0;
+        isMouseDown = false;
+    }
 
     // 绘制多边形
     function polygonDrawHandler(points) {
@@ -89,26 +100,37 @@ var imgSelector = function (imgId, options) {
         };
         labelDataMap.put(polygonId, labelData);
         // 注册事件
-        // 顶点移动处理器
-        pointMoveEventHandler(polygon);
-        // 区域移动处理器
-        areaMoveEventHandler(polygon);
+        // 图形调整处理器
+        resizeHandler(polygon);
+        // 拖动处理器
+        dragHandler(polygon);
         // 区域操作处理器
         areaOperateHandler(polygon)
     }
 
     // 顶点移动处理器
-    function pointMoveEventHandler(element) {
+    function resizeHandler(element) {
+        // 注册调整区域完毕事件
+        element.on('resizing', function () {
+            // 屏蔽画图
+            isResize = true;
+        });
         // 注册调整区域完毕事件
         element.on('resizedone', function () {
             // this 代表当前元素,更新区域坐标
             // console.log(this.node.attributes.getNamedItem('points'));
-            updateElementPoints(this)
+            updateElementPoints(this);
+            isResize = false;
+            clearDrawPositon();
         });
     }
 
     // 区域移动处理器
-    function areaMoveEventHandler(element) {
+    function dragHandler(element) {
+        element.on('dragstart', function () {
+            // 屏蔽画图
+            isDrag = true;
+        });
         element.on('mouseover', function (e) {
             // 鼠标变成移动图标
             this.style('cursor:move');
@@ -116,6 +138,8 @@ var imgSelector = function (imgId, options) {
         element.on('dragend', function () {
             // this 代表当前元素,更新区域坐标
             updateElementPoints(this)
+            isDrag = false;
+            clearDrawPositon();
         });
     }
 
@@ -251,28 +275,27 @@ var imgSelector = function (imgId, options) {
         updateLabelTemplate(elementId, labelText);
     }
 
-    var x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false;
-
     // 添加多边形
     function areaAddListener() {
         $('#panel').mousemove(function (event) {
+            // 没有拖动和调整区域的时候才能画图
             // 如果拖动的时候，点击鼠标左键，绘制图片
-            if (1 == event.which && !isMouseDown) {
+            if (1 == event.which && !isMouseDown && !isResize && !isDrag) {
                 x1 = event.offsetX;
                 y1 = event.offsetY;
                 isMouseDown = true;
-                console.log('x1:' + event.offsetX);
-                console.log('y1:' + event.offsetY);
+                // console.log('x1:' + event.offsetX);
+                // console.log('y1:' + event.offsetY);
             }
 
-            if (0 == event.which && isMouseDown) {
+            if (0 == event.which && isMouseDown && !isResize && !isDrag) {
                 x2 = event.offsetX;
                 y2 = event.offsetY;
                 isMouseDown = false;
                 // 渲染标签
                 polygonDrawHandler(getPolygonPointsByCross([[x1, y1], [x2, y2]]));
-                console.log('x2:' + event.offsetX);
-                console.log('y2:' + event.offsetY);
+                // console.log('x2:' + event.offsetX);
+                // console.log('y2:' + event.offsetY);
                 // 清零
                 x1 = 0;
                 y1 = 0;
