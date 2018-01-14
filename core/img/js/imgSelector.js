@@ -41,12 +41,28 @@ var imgSelector = function (imgId, options) {
             }
         ];
 
-
-    // 创建多边形
-    function polygonHandler() {
+    // 绘制多边形
+    function polygonDrawHandler(points) {
+        if (!points) {
+            console.log('请选择点');
+            return
+        }
         var polygon = draw.polygon()
-            .plot([[180, 10], [280, 10], [280, 200], [180, 200]])
+            .plot(points)
             .fill('none').stroke({width: 2});
+
+        // var pointsNum = 0;
+        // // 开启绘制多边形
+        // var polygon = draw.polygon().fill('none').stroke({width: 2}).draw();
+        // // 目前只能画四个点
+        // polygon.on('drawpoint', function () {
+        //     console.log('drawpoint');
+        //     pointsNum++;
+        //     if (pointsNum === 3) {
+        //         polygon.draw('done');
+        //     }
+        // });
+
         var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
         // 配置区域选择最大区域,允许选择和拖动
         var constraint = {
@@ -56,9 +72,9 @@ var imgSelector = function (imgId, options) {
             maxY: img.height
         };
         var opt = {
-            constraint: constraint,
-            snapToGrid: 10,
-            snapToAngle: 5
+            constraint: constraint
+            // snapToGrid: 5,
+            // snapToAngle: 2
         };
         polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
@@ -93,14 +109,14 @@ var imgSelector = function (imgId, options) {
 
     // 区域移动处理器
     function areaMoveEventHandler(element) {
-        element.on('mouseover', function () {
+        element.on('mouseover', function (e) {
             // 鼠标变成移动图标
             this.style('cursor:move');
         });
         element.on('dragend', function () {
             // this 代表当前元素,更新区域坐标
             updateElementPoints(this)
-        })
+        });
     }
 
     // 更新labelMap坐标信息
@@ -114,27 +130,36 @@ var imgSelector = function (imgId, options) {
     // 区域操作处理器
     function areaOperateHandler(element) {
         // 双击打开标签
-        element.on('dblclick', function () {
-            // 渲染标签
-            updateLabelTemplate(this.node.attributes.getNamedItem('id').nodeValue);
+        // 右键点击打开标签等
+        var polygonId = element.node.attributes.getNamedItem('id').nodeValue;
+        $('#' + polygonId).mousedown(function (event) {
+            //阻止浏览器默认右键点击事件
+            $(this).bind("contextmenu", function () {
+                return false;
+            });
+            if (3 == event.which) {
+                // 渲染标签
+                updateLabelTemplate(polygonId);
+            }
         });
     }
 
-    // 渲染标签
+    // 渲染标签 elementId：当前元素id, currentLabel:要设置的标签
     function updateLabelTemplate(elementId, currentLabel) {
         // 初始化UI组件
         layui.use(['laytpl'], function () {
-            var layTemplate = layui.laytpl;
+            var layTemplate = layui.laytpl
             var data = {
                 // 标签数据
                 'currentLabel': currentLabel,
-                'elementId': elementId
+                'elementId': elementId,
+                'labels': officialLabels
             };
             var
                 // 获取模板
                 template = document.getElementById('labelTemplate').innerHTML,
                 // 获取渲染视图
-                view = document.getElementById('labelView');
+                view = document.getElementById('option-label');
             // 渲染标签模板
             // 如果刚进来没有标签，显示暂无标签，请标注
             if (!data.currentLabel) {
@@ -145,69 +170,31 @@ var imgSelector = function (imgId, options) {
             });
             // 显示标签
             $('#labelView').show();
+            $('#custom-label').show();
             // 标签处理器
             labelTemplateHandler();
-        });
-    }
-
-    // 渲染标签列表
-    function updateLabelsTemplate() {
-        // 初始化UI组件
-        layui.use(['laytpl'], function () {
-            var layTemplate = layui.laytpl;
-            var data = {
-                'labels': officialLabels
-            };
-            var
-                // 获取模板
-                template = document.getElementById('labelsTemplate').innerHTML,
-                // 获取渲染视图
-                view = document.getElementById('labelsView');
-            // 渲染
-            layTemplate(template).render(data, function (renderedHtml) {
-                view.innerHTML = renderedHtml;
-            });
-            // 显示标签
-            $('#labelsView').show();
-            labelsTemplateHandler()
-        });
-    }
-
-    // 标签列表处理器
-    function labelsTemplateHandler() {
-        // 取消 -> 隐藏
-        $('button#labelCancel').click(function () {
-            console.log('取消 -> 隐藏');
-            $('#labelsView').hide()
-        });
-
-        // 确认
-        $('button#labelConfirm').click(function () {
-            console.log('确认 -> 隐藏');
-            $('#labelsView').hide()
-        });
-        // 点击标签处理器
-        $('.officialLabel').click(function () {
-            // 获取当前选择的 elementId
-            var elementId = $('#elementId').text();
-            // 获取当前标注的标签数据
-            var label = labelDataMap.get(elementId);
-            // 赋值
-            label.label = $(this).children('#labelItem').text();
-            // 更新标签
-            updateLabelTemplate(elementId, label.label);
-            console.log(label)
+            // 自定义标签处理
         });
     }
 
     // 标签处理器
     function labelTemplateHandler() {
         var elementId = $('#elementId').text();
+        // 处理自定义标签
+        layui.use(['form'], function () {
+            var form = layui.form;
+            // 监听提交
+            form.on('submit(label)', function (data) {
+                // 获取自定义标签，并且刷新当前标签值
+                refreshCurrentLabel(data.field.name);
+                return false;
+            });
+        });
 
         // 处理编辑标签事件
         $('button#editLabelButton').click(function () {
             // 更新标签列表
-            updateLabelsTemplate();
+            // updateLabelsTemplate();
         });
 
         // 处理删除按钮事件
@@ -231,13 +218,75 @@ var imgSelector = function (imgId, options) {
         $('button#closeLabelTemplate').click(function () {
             $('#labelView').hide()
         });
+
+        // 标签列表处理器
+        // 取消 -> 隐藏
+        $('button#labelCancel').click(function () {
+            console.log('取消 -> 隐藏');
+            $('#labelsView').hide()
+        });
+
+        // 确认
+        $('button#labelConfirm').click(function () {
+            console.log('确认 -> 隐藏');
+            $('#labelsView').hide()
+        });
+        // 点击标签处理器
+        $('.officialLabel').click(function () {
+            // 获取获取标签值
+            var labelText = $(this).children('#labelItem').text();
+            refreshCurrentLabel(labelText);
+        });
     }
+
+    // 刷新当前标签显示值
+    function refreshCurrentLabel(labelText) {
+        // 获取当前选择的 elementId
+        var elementId = $('#elementId').text();
+        // 获取当前标注的标签数据
+        var label = labelDataMap.get(elementId);
+        // 赋值
+        label.label = labelText;
+        // 更新标签
+        updateLabelTemplate(elementId, labelText);
+    }
+
+    var x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false;
 
     // 添加多边形
     function areaAddListener() {
-        $('#addAreaButton').click(function () {
-            polygonHandler();
-        })
+        $('#panel').mousemove(function (event) {
+            // 如果拖动的时候，点击鼠标左键，绘制图片
+            if (1 == event.which && !isMouseDown) {
+                x1 = event.offsetX;
+                y1 = event.offsetY;
+                isMouseDown = true;
+                console.log('x1:' + event.offsetX);
+                console.log('y1:' + event.offsetY);
+            }
+
+            if (0 == event.which && isMouseDown) {
+                x2 = event.offsetX;
+                y2 = event.offsetY;
+                isMouseDown = false;
+                // 渲染标签
+                polygonDrawHandler(getPolygonPointsByCross([[x1, y1], [x2, y2]]));
+                console.log('x2:' + event.offsetX);
+                console.log('y2:' + event.offsetY);
+                // 清零
+                x1 = 0;
+                y1 = 0;
+                x2 = 0;
+                y2 = 0;
+            }
+        });
+    }
+
+    // 通过对角线两点构建多边形坐标
+    function getPolygonPointsByCross(points) {
+        var point1 = points[0];
+        var point2 = points[1];
+        return [point1, [point2[0], point1[1]], point2, [point1[0], point2[1]]]
     }
 
     // 初始化图片信息，img为图片id
@@ -250,13 +299,16 @@ var imgSelector = function (imgId, options) {
     function init() {
         // 初始化图片并且获取图片真实宽度和高度
         imgInit(imgId);
+        // 初始化画板以及背景图片
+        draw = new SVG('panel').size(img.width, img.height);
+        // draw.image('http://oaes384x0.bkt.clouddn.com/08f790529822720eb83f561771cb0a46f31fab6e.jpg', img.width, img.height);
         // 初始化区域存储map
         areaMap = new Map();
         // 初始化dataMap
         labelDataMap = new Map();
-        // 初始化画板
-        draw = new SVG('panel').size(img.width, img.height);
-        areaAddListener();
+        // 绘制多边形处理器
+        // polygonDrawHandler();
+        areaAddListener()
     }
 
     // 自定义Map,存储所选区域
