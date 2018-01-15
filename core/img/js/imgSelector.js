@@ -49,8 +49,8 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
             stroke: '#000',
             'stroke-width': 1
         }, textOptions = {
-            stroke: '#FF0000',
-            'stroke-width': 1
+            // stroke: '#FF0000',
+            // 'stroke-width': 0.5
         };
 
     // 清除画图点
@@ -243,10 +243,14 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
                 // 移除文字标签
                 deleteText(elementId)
             }
+            // 清空自定义标签
+            $('#customLabel').val('');
             $('#labelView').hide()
         });
         // 处理关闭标签事件
         $('button#closeLabelTemplate').click(function () {
+            // 清空自定义标签
+            $('#customLabel').val('');
             $('#labelView').hide()
         });
         // 自定义标签 确认操作
@@ -255,6 +259,8 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
             if (customLabel) {
                 refreshCurrentLabel(customLabel);
             }
+            // 清空自定义标签
+            $('#customLabel').val('');
             // 隐藏标签面板
             $('#labelView').hide()
         });
@@ -268,38 +274,55 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
 
     // 获取标注标签最终位置 points为area的顶点数组
     function getSuitablePosition(points) {
-        var Xmin = Math.min(points[0][0], points[1][0], points[2][0], points[3][0]);
-        var Xmax = Math.max(points[0][0], points[1][0], points[2][0], points[3][0]);
-        var Ymin = Math.min(points[0][1], points[1][1], points[2][1], points[3][1]);
-        var Ymax = Math.min(points[0][1], points[1][1], points[2][1], points[3][1]);
-        return {x: (Xmin + Xmax) / 2, y: (Ymin + Ymax) / 2}
+        var x = [points[0][0], points[1][0], points[2][0], points[3][0]];
+        var y = [points[0][1], points[1][1], points[2][1], points[3][1]];
+        // 排序
+        x.sort(function (x1, x2) {
+            return x1 - x2;
+        });
+        y.sort(function (y1, y2) {
+            return y1 - y2;
+        });
+        return {x: (x[1] + x[2]) / 2, y: (y[1] + y[2]) / 2}
     }
 
     // 调整文字标签位置
     function adjustTextPosition(elementId) {
         // 获取文字标签
         var text = textMap.get(elementId);
-        var element = areaMap.get(elementId);
-        // 获取元素坐标点
-        var points = element.array().value;
-        // 调整标签位置
-        var suitablePoints = getSuitablePosition(points);
-        text.attr({x: suitablePoints.x, y: suitablePoints.y});
+        if (text) {
+            var element = areaMap.get(elementId);
+            // 获取元素坐标点
+            var points = element.array().value;
+            // 调整标签位置
+            var suitablePoints = getSuitablePosition(points);
+            text.attr({x: suitablePoints.x, y: suitablePoints.y});
+        }
     }
 
     // 删除文字标签
     function deleteText(elementId) {
         var text = textMap.get(elementId);
-        text.remove();
-        areaMap.remove(elementId);
+        if (text) {
+            text.remove();
+            areaMap.remove(elementId);
+        }
     }
 
     // 创建文字标签
     function createText(elementId, labelText) {
         // 获取element添加文字标签
-        var text = draw.text(labelText).attr(textOptions);
-        textMap.put(elementId, text);
-        adjustTextPosition(elementId);
+        if (elementId && labelText) {
+            // 首先查看是否已经有标签，有则更新，没有则创建
+            var storageText = textMap.get(elementId);
+            if (!storageText) {
+                var text = draw.text(labelText).attr(textOptions);
+                textMap.put(elementId, text);
+                adjustTextPosition(elementId);
+            } else {
+                storageText.node.textContent = labelText;
+            }
+        }
     }
 
     // 刷新当前标签显示值
