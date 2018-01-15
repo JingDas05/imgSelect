@@ -17,6 +17,7 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         //     }
         // }
         labelDataMap,
+        textMap,
         draw,
         // 官方标签库
         officialLabels = officialLabelsDefine || [
@@ -59,7 +60,7 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
     }
 
     // 绘制多边形
-    function polygonDrawHandler(points) {
+    function polygonDrawHandler(points, labelText) {
         if (!points) {
             console.log('请选择点');
             return
@@ -67,7 +68,19 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         var polygon = draw.polygon()
             .plot(points).attr(colorOptions);
         var polygonId = polygon.node.attributes.getNamedItem('id').nodeValue;
-        console.log(polygon);
+        // 将多边形添加到areaMap中
+        areaMap.put(polygonId, polygon);
+        // 构造标签数据
+        var labelData = {
+            label: labelText || '',
+            points: polygon.array().value,
+            elementId: polygonId
+        };
+        labelDataMap.put(polygonId, labelData);
+        // 如果有文字标签需要显示文字标签
+        if (labelText) {
+            createText(polygonId, labelText)
+        }
         // 配置区域选择最大区域,允许选择和拖动
         var constraint = {
             minX: 0,
@@ -83,15 +96,6 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         polygon.selectize({deepSelect: true}).resize(opt);
         // 允许拖动
         polygon.draggable(constraint);
-        // 将多边形添加到areaMap中
-        areaMap.put(polygonId, polygon);
-        // 构造标签数据
-        var labelData = {
-            label: '',
-            points: polygon.array().value,
-            elementId: polygonId
-        };
-        labelDataMap.put(polygonId, labelData);
         // 注册事件
         // 图形调整处理器
         resizeHandler(polygon);
@@ -107,6 +111,9 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         element.on('resizing', function () {
             // 屏蔽画图
             isResize = true;
+            // 调整标签坐标
+            var elementId = this.node.attributes.getNamedItem('id').nodeValue;
+            adjustTextPosition(elementId);
         });
         // 注册调整区域完毕事件
         element.on('resizedone', function () {
@@ -114,6 +121,7 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
             // console.log(this.node.attributes.getNamedItem('points'));
             updateElementPoints(this);
             isResize = false;
+            // 清除画图坐标点
             clearDrawPositon();
         });
     }
@@ -126,8 +134,12 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         });
         element.on('dragend', function () {
             // this 代表当前元素,更新区域坐标
-            updateElementPoints(this)
+            updateElementPoints(this);
+            // 调整文字标签区域
+            var elementId = this.node.attributes.getNamedItem('id').nodeValue;
+            adjustTextPosition(elementId);
             isDrag = false;
+            // 清除画图坐标点
             clearDrawPositon();
         });
     }
@@ -225,6 +237,8 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
                 // map中移除
                 areaMap.remove(elementId);
                 labelDataMap.remove(elementId);
+                // 移除文字标签
+                deleteText(elementId)
             }
             $('#labelView').hide()
         });
@@ -249,7 +263,7 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         });
     }
 
-    // 获取标注标签最终位置
+    // 获取标注标签最终位置 points为area的顶点数组
     function getSuitablePosition(points) {
         var Xmin = Math.min(points[0][0], points[1][0], points[2][0], points[3][0]);
         var Xmax = Math.max(points[0][0], points[1][0], points[2][0], points[3][0]);
@@ -258,16 +272,39 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         return {x: (Xmin + Xmax) / 2, y: (Ymin + Ymax) / 2}
     }
 
+    // 调整文字标签位置
+    function adjustTextPosition(elementId) {
+        // 获取文字标签
+        var text = textMap.get(elementId);
+        var element = areaMap.get(elementId);
+        // 获取元素坐标点
+        var points = element.array().value;
+        // 调整标签位置
+        var suitablePoints = getSuitablePosition(points);
+        text.attr({x: suitablePoints.x, y: suitablePoints.y});
+    }
+
+    // 删除文字标签
+    function deleteText(elementId) {
+        var text = textMap.get(elementId);
+        text.remove();
+        areaMap.remove(elementId);
+    }
+
+    // 创建文字标签
+    function createText(elementId, labelText) {
+        // 获取element添加文字标签
+        var text = draw.text(labelText);
+        textMap.put(elementId, text);
+        adjustTextPosition(elementId);
+    }
+
     // 刷新当前标签显示值
     function refreshCurrentLabel(labelText) {
         // 获取当前选择的 elementId
         var elementId = $('#elementId').text();
-        // 获取element添加标签展示
-        // var element = areaMap.get(elementId);
-        // var points = element.array().value;
-        // var suitablePoints = getSuitablePosition(points);
-        // var text = draw.text(labelText);
-        // text.attr({x: suitablePoints.x, y: suitablePoints.y});
+        // 创建文字标签
+        createText(elementId, labelText);
         // console.log(element);
         // 获取当前标注的标签数据
         var label = labelDataMap.get(elementId);
@@ -338,6 +375,8 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
         areaMap = new Map();
         // 初始化dataMap
         labelDataMap = new Map();
+        // 初始化文字标签
+        textMap = new Map();
         // 绘制多边形处理器
         // polygonDrawHandler();
         areaAddListener()
@@ -469,13 +508,13 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
     }
 
     // 根据点的数组绘制图形
-    function showElementsByPoints(points) {
+    this.showElementsByPoints = function (points) {
         if (points instanceof Array && points) {
             points.forEach(function (each) {
-                polygonDrawHandler(each.points);
+                polygonDrawHandler(each.points, each.label);
             })
         }
-    }
+    };
 
     init();
 
@@ -500,7 +539,6 @@ imgSelector.prototype = {
     // 回填标签数据，数据结构为（导出数据)
     // [{label: "绿萝", points: [[176,122], [255, 122], [255, 209], [176, 209]], elementId: "SvgjsPolygon1008"},{label: "绿萝", points: [[352,196], [416, 196], [416, 288], [352, 288]], elementId: "SvgjsPolygon1008"}]
     setLabels: function (points) {
-        console.log(points);
         this.showElementsByPoints(points)
     }
 };
