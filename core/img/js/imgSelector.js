@@ -1,7 +1,9 @@
 /**
  * @author wusi
  */
-var imgSelector = function (imgId, officialLabelsDefine, options) {
+
+//
+var imgSelector = function (imgSrc, officialLabelsDefine, options) {
 
     var
         // 当前加载图片
@@ -385,15 +387,17 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
     }
 
     // 初始化图片信息，img为图片id
-    function imgInit(imgId) {
+    function imgInit(imgSrc) {
         var theImage = new Image();
-        theImage.src = $(imgId).attr('src');
+        var imgPanel = $('#img-bg');
+        imgPanel.attr('src', imgSrc);
+        theImage.src = imgSrc;
         img = theImage;
     }
 
     function init() {
         // 初始化图片并且获取图片真实宽度和高度
-        imgInit(imgId);
+        imgInit(imgSrc);
         // 初始化画板以及背景图片
         draw = new SVG('panel').size(img.width, img.height);
         // draw.image('http://oaes384x0.bkt.clouddn.com/08f790529822720eb83f561771cb0a46f31fab6e.jpg', img.width, img.height);
