@@ -48,6 +48,9 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
             'fill-opacity': 0.3,
             stroke: '#000',
             'stroke-width': 1
+        }, textOptions = {
+            stroke: '#FF0000',
+            'stroke-width': 1
         };
 
     // 清除画图点
@@ -294,7 +297,7 @@ var imgSelector = function (imgId, officialLabelsDefine, options) {
     // 创建文字标签
     function createText(elementId, labelText) {
         // 获取element添加文字标签
-        var text = draw.text(labelText);
+        var text = draw.text(labelText).attr(textOptions);
         textMap.put(elementId, text);
         adjustTextPosition(elementId);
     }
@@ -537,7 +540,7 @@ imgSelector.prototype = {
         return notNullLabels;
     },
     // 回填标签数据，数据结构为（导出数据)
-    // [{label: "绿萝", points: [[176,122], [255, 122], [255, 209], [176, 209]], elementId: "SvgjsPolygon1008"},{label: "绿萝", points: [[352,196], [416, 196], [416, 288], [352, 288]], elementId: "SvgjsPolygon1008"}]
+    // [{label: "仙人掌", points: [[176,122], [255, 122], [255, 209], [176, 209]], elementId: "SvgjsPolygon1008"},{label: "绿萝", points: [[352,196], [416, 196], [416, 288], [352, 288]], elementId: "SvgjsPolygon1008"}]
     setLabels: function (points) {
         this.showElementsByPoints(points)
     }
