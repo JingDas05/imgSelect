@@ -55,11 +55,13 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
         colorOptions = {
             fill: '#B0C4DE',
             'fill-opacity': 0.3,
-            stroke: '#000',
+            // stroke: '#000',
             'stroke-width': 1
-        }, textOptions = {
-            // stroke: '#FF0000',
-            // 'stroke-width': 0.5
+        },
+        textOptions = {
+            color: '#f06',
+            // opacity: 0.6
+            width: 1
         };
 
     // 清除画图点
@@ -325,7 +327,7 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
             // 首先查看是否已经有标签，有则更新，没有则创建
             var storageText = textMap.get(elementId);
             if (!storageText) {
-                var text = draw.text(labelText).attr(textOptions);
+                var text = draw.text(labelText).stroke(textOptions);
                 textMap.put(elementId, text);
                 adjustTextPosition(elementId);
             } else {
