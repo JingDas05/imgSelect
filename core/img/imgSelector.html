@@ -12,7 +12,6 @@
         <div id="panel" style="position: absolute; right: 800px; top: 200px"></div>
         <img id="img-bg" src=""
              style="z-index: -1; position: absolute; right: 800px; top: 200px">
-        <!--<button id="addAreaButton" style="width: 100px;height: 45px;float: right;margin-right: 250px">添加多边形</button>-->
         <!--模板引擎渲染标签以及标签操作-->
         <div id="labelView"
              style="display: none;width: 310px; position: absolute; background-color: 	#87CEFA;padding: 20px">
@@ -34,12 +33,12 @@
 <script type="text/javascript" src="js/svg.select.js"></script>
 <script type="text/javascript" src="js/svg.resize.js"></script>
 <script type="text/javascript" src="js/svg.draggable.js"></script>
-<script type="text/javascript" src="js/svg.draw.js"></script>
+<!--ui交互库-->
 <script type="text/javascript" src="layui/layui.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $(function () {
-            result = new imgSelector('./08f790529822720eb83f561771cb0a46f31fab6e.jpg', [
+            result = new imgSelector('img-bg','./08f790529822720eb83f561771cb0a46f31fab6e.jpg', [
                 {
                     'id': '',
                     'name': '官方绿萝'
@@ -57,9 +56,6 @@
 <script id="labelTemplate" type="text/html">
     <h3>{{ d.currentLabel }}</h3>
     <div class="layui-btn-group">
-        <!--<button id="editLabelButton" class="layui-btn layui-btn-primary layui-btn-sm">-->
-        <!--<i class="layui-icon">&#xe642;</i>-->
-        <!--</button>-->
         <button id="deleteAreaButton" class="layui-btn layui-btn-primary layui-btn-sm">
             <span id="elementId" style="display: none">{{ d.elementId }}</span>
             <i class="layui-icon">&#xe640;</i>
@@ -90,6 +86,5 @@
         </table>
     </div>
 </script>
-
 </body>
 </html>

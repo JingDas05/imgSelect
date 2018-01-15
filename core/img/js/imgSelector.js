@@ -2,8 +2,8 @@
  * @author wusi
  */
 
-//
-var imgSelector = function (imgSrc, officialLabelsDefine, options) {
+// containerId: 容器id, imgSrc:图片路径， officialLabelsDefine：标签列表
+var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) {
 
     var
         // 当前加载图片
@@ -29,27 +29,7 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
         textMap,
         draw,
         // 官方标签库
-        officialLabels = officialLabelsDefine || [
-                {
-                    'id': '',
-                    'name': '绿萝'
-                },
-                {
-                    'id': '',
-                    'name': '仙人掌'
-                }, {
-                    'id': '',
-                    'name': '虎皮兰'
-                },
-                {
-                    'id': '',
-                    'name': '多肉'
-                },
-                {
-                    'id': '',
-                    'name': '竹'
-                }
-            ],
+        officialLabels = officialLabelsDefine,
         // 画图相关参数，调整时isResize必须为true,拖动时isDrag必须为true,之后置位清零
         x1, y1, x2, y2, isMouseDown = false, isResize = false, isDrag = false,
         colorOptions = {
@@ -397,7 +377,7 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
 
     // 初始化图片信息，img为图片id
     function imgInit(imgSrc) {
-        var imgPanel = $('#img-bg');
+        var imgPanel = $('#' + containerId);
         // 设置图片属性
         imgPanel.attr('src', imgSrc);
         isImgLoad(function () {
@@ -412,7 +392,7 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
 
     // 判断图片是否加载完毕
     function isImgLoad(callback) {
-        var imgPanel = $('#img-bg')
+        var imgPanel = $('#' + containerId)
         var isLoad = true;
         // 找到为0就将isLoad设为false，并退出each
         if (imgPanel.height() === 0) {
