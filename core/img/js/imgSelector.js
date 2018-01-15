@@ -40,8 +40,10 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
         },
         textOptions = {
             color: '#f06',
-            // opacity: 0.6
-            width: 1
+            width: 1,
+            fill: '#f06',
+            'text-anchor': 'middle',
+            'pointer-events': 'none'
         };
 
     // 清除画图点
@@ -307,7 +309,8 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
             // 首先查看是否已经有标签，有则更新，没有则创建
             var storageText = textMap.get(elementId);
             if (!storageText) {
-                var text = draw.text(labelText).stroke(textOptions);
+                // var text = draw.text(labelText).stroke(textOptions);
+                var text = draw.text(labelText).attr(textOptions);
                 textMap.put(elementId, text);
                 adjustTextPosition(elementId);
             } else {
