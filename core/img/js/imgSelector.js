@@ -7,7 +7,14 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
 
     var
         // 当前加载图片
-        img,
+        img = {
+            width: 0,
+            height: 0
+        },
+        // 图片判断加载定时器
+        t_img,
+        // 图片是否加载标志位
+        isLoad = true,
         // 保存区域
         areaMap,
         // 保存标签坐标点，获取数组可以调用 labelDataMap.values()
@@ -388,19 +395,46 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
 
     // 初始化图片信息，img为图片id
     function imgInit(imgSrc) {
-        var theImage = new Image();
         var imgPanel = $('#img-bg');
+        // 设置图片属性
         imgPanel.attr('src', imgSrc);
-        theImage.src = imgSrc;
-        img = theImage;
+        isImgLoad(function () {
+            img = {
+                width: imgPanel.width(),
+                height: imgPanel.height()
+            };
+            // 初始化画板以及背景图片
+            draw = new SVG('panel').size(img.width, img.height);
+        })
     }
+
+    // 判断图片是否加载完毕
+    function isImgLoad(callback) {
+        var imgPanel = $('#img-bg')
+        var isLoad = true;
+        // 找到为0就将isLoad设为false，并退出each
+        if (imgPanel.height() === 0) {
+            isLoad = false;
+        }
+        // 为true，加载完毕
+        if (isLoad) {
+            // 清除定时器
+            clearTimeout(t_img);
+            // 回调函数
+            callback();
+            return true;
+        } else {
+            isLoad = true;
+            t_img = setTimeout(function () {
+                isImgLoad(callback); // 递归扫描
+            }, 200);
+        }
+    }
+
 
     function init() {
         // 初始化图片并且获取图片真实宽度和高度
         imgInit(imgSrc);
-        // 初始化画板以及背景图片
-        draw = new SVG('panel').size(img.width, img.height);
-        // draw.image('http://oaes384x0.bkt.clouddn.com/08f790529822720eb83f561771cb0a46f31fab6e.jpg', img.width, img.height);
         // 初始化区域存储map
         areaMap = new Map();
         // 初始化dataMap
@@ -408,7 +442,6 @@ var imgSelector = function (imgSrc, officialLabelsDefine, options) {
         // 初始化文字标签
         textMap = new Map();
         // 绘制多边形处理器
-        // polygonDrawHandler();
         areaAddListener()
     }
 
