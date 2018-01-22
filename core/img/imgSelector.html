@@ -40,11 +40,11 @@
         $(function () {
             result = new imgSelector('img-bg','./08f790529822720eb83f561771cb0a46f31fab6e.jpg', [
                 {
-                    'id': '',
+                    'id': '1',
                     'name': '官方绿萝'
                 },
                 {
-                    'id': '',
+                    'id': '2',
                     'name': '官方仙人掌'
                 }
             ])
@@ -79,6 +79,7 @@
             {{# layui.each(d.labels, function(index, item){ }}
             <tr class="officialLabel" style="cursor: pointer">
                 <td id="labelItem">{{ item.name }}</td>
+                <td id="labelItemId" style="display: none">{{ item.id }}</td>
                 <!--<td id="labelIndex" style="display: none">{{ index }}</td>-->
             </tr>
             {{# }); }}

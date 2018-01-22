@@ -56,7 +56,7 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
     }
 
     // 绘制多边形
-    function polygonDrawHandler(points, labelText) {
+    function polygonDrawHandler(points, labelText, labelId) {
         if (!points) {
             console.log('请选择点');
             return
@@ -69,6 +69,7 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
         // 构造标签数据
         var labelData = {
             label: labelText || '',
+            labelId: labelId,
             points: polygon.array().value,
             elementId: polygonId
         };
@@ -261,7 +262,8 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
         $('.officialLabel').click(function () {
             // 获取获取标签值
             var labelText = $(this).children('#labelItem').text();
-            refreshCurrentLabel(labelText);
+            var labelTextId = $(this).children('#labelItemId').text();
+            refreshCurrentLabel(labelText, labelTextId);
         });
     }
 
@@ -320,7 +322,7 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
     }
 
     // 刷新当前标签显示值
-    function refreshCurrentLabel(labelText) {
+    function refreshCurrentLabel(labelText, labelTextId) {
         // 获取当前选择的 elementId
         var elementId = $('#elementId').text();
         // 创建文字标签
@@ -330,8 +332,10 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
         var label = labelDataMap.get(elementId);
         // 赋值
         label.label = labelText;
+        if (labelTextId) {
+            label.labelId = labelTextId;
+        }
         // 将标签展示到选择框里
-
         // 更新标签
         updateLabelTemplate(elementId, labelText);
     }
@@ -566,7 +570,7 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
     this.showElementsByPoints = function (points) {
         if (points instanceof Array && points) {
             points.forEach(function (each) {
-                polygonDrawHandler(each.points, each.label);
+                polygonDrawHandler(each.points, each.label, each.labelId);
             })
         }
     };
