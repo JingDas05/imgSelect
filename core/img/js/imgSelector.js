@@ -379,11 +379,11 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
     }
 
     // 初始化图片信息，img为图片id
-    function imgInit(imgSrc) {
-        var imgPanel = $('#' + containerId);
+    function imgInit(imgSrcParam, containerIdParam) {
+        var imgPanel = $('#' + containerIdParam);
         // 设置图片属性
-        imgPanel.attr('src', imgSrc);
-        isImgLoad(function () {
+        imgPanel.attr('src', imgSrcParam);
+        isImgLoad(containerIdParam, function () {
             img = {
                 width: imgPanel.width(),
                 height: imgPanel.height()
@@ -394,8 +394,8 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
     }
 
     // 判断图片是否加载完毕
-    function isImgLoad(callback) {
-        var imgPanel = $('#' + containerId)
+    function isImgLoad(containerIdParam, callback) {
+        var imgPanel = $('#' + containerIdParam);
         var isLoad = true;
         // 找到为0就将isLoad设为false，并退出each
         if (imgPanel.height() === 0) {
@@ -411,15 +411,22 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
         } else {
             isLoad = true;
             t_img = setTimeout(function () {
-                isImgLoad(callback); // 递归扫描
+                isImgLoad(containerIdParam, callback); // 递归扫描
             }, 200);
         }
     }
 
 
-    function init() {
+    function init(containerParam, imgSrcParam, officialLabelsDefineParam) {
         // 初始化图片并且获取图片真实宽度和高度
-        imgInit(imgSrc);
+        if (imgSrcParam && containerParam) {
+            imgInit(imgSrcParam, containerParam);
+        } else {
+            imgInit(imgSrc, containerId);
+        }
+        if (officialLabelsDefineParam) {
+            this.officialLabels = officialLabelsDefineParam;
+        }
         // 初始化区域存储map
         areaMap = new Map();
         // 初始化dataMap
@@ -566,6 +573,10 @@ var imgSelector = function (containerId, imgSrc, officialLabelsDefine, options) 
 
     init();
 
+    this.changeImg = function (containerParam, imgSrcParam, officialLabelsDefine) {
+        init(containerParam, imgSrcParam, officialLabelsDefine)
+    };
+
     this.labelDataMap = labelDataMap;
 };
 
@@ -588,5 +599,8 @@ imgSelector.prototype = {
     // [{label: "仙人掌", points: [[176,122], [255, 122], [255, 209], [176, 209]], elementId: "SvgjsPolygon1008"},{label: "绿萝", points: [[352,196], [416, 196], [416, 288], [352, 288]], elementId: "SvgjsPolygon1008"}]
     setLabels: function (points) {
         this.showElementsByPoints(points)
+    },
+    changeImgWith: function (containerParam, imgSrcParam, officialLabelsDefine) {
+        this.changeImg(containerParam, imgSrcParam, officialLabelsDefine)
     }
 };
